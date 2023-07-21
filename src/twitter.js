@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import { GrapQLRequest } from "./graphql.js";
 import { has_error } from "./error.js";
+import { parse } from 'cookie';
 
 const gql_id = {
     "like": "lI07N6Otwv1PhnEgXILM7A",
@@ -13,16 +14,30 @@ const endpoints = {
     "retweet": `https://api.twitter.com/graphql/${gql_id["retweet"]}/CreateRetweet`
 };
 
+function getOrDefault(dict, name, def) {
+    if (name in dict) {
+        return name + '=' + dict[name] + ";";
+    }
+
+    if (def === undefined) {
+        return '';
+    }
+
+    return name + '=' + def + ";";
+}
+
 export class TwitterClient {
     constructor(authorization, auth_token) {
-        this.auth_token = auth_token;
         this.authorization = authorization;
+        this.auth_token = auth_token;
     }
 
     async connect() {
         const response = await fetch("https://twitter.com/home", {
-            method: 'get',
-            headers: { 'Cookie': `auth_token=${this.auth_token}; ct0=960eb16898ea5b715b54e54a8f58c172` }
+            method: 'GET',
+            headers: {
+                'Cookie': `auth_token=${this.auth_token}; guest_id=v1%9999;`
+            }
         });
 
         if (!response.ok) {
@@ -31,29 +46,25 @@ export class TwitterClient {
         }
 
         const cookie_header = response.headers.get("set-cookie");
-        const cookies = cookie_header.split(" ");
+        const cookiesArray = cookie_header.split(',');
 
-        let ct0 = undefined;
+        const parsedCookies = cookiesArray.reduce((cookies, cookieString) => {
+            const parsedCookie = parse(cookieString);
+            return { ...cookies, ...parsedCookie };
+        }, {});
 
-        for (const index in cookies) {
-            const cookie = cookies[index];
-
-            if (cookie.startsWith("ct0=")) {
-                ct0 = cookie.substring(0, cookie.length - 1);
-                break;
-            }
-        }
+        let ct0 = parsedCookies['ct0'];
 
         if (ct0 === undefined) {
             console.error(cookie_header);
             throw new Error("Can't find csrf token in twitter cookies header");
         }
 
-        this.csrf = ct0.split("=")[1];
+        this.csrf = ct0;
 
         this.header = {
             "Authorization": "Bearer " + this.authorization,
-            "Cookie": `auth_token=${this.auth_token}; ct0=${this.csrf}; lang=en`,
+            "Cookie": `auth_token=${this.auth_token}; ct0=${this.csrf}; ${getOrDefault(parsedCookies, 'lang', 'en')} ${getOrDefault(parsedCookies, 'gest_id', undefined)}${getOrDefault(parsedCookies, 'twid', undefined)}`,
             "x-csrf-token": this.csrf
         };
     }
