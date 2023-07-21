@@ -133,16 +133,19 @@ export class TwitterClient {
         }
     }
 
-    async search(keywords) {
-        console.log(this.header);
+    async search(query, type = "Latest", count = 20) {
+        const variables = encodeURI(JSON.stringify({ "rawQuery": query, "count": count, "querySource": "typed_query", "product": type }));
+        const features = encodeURI(JSON.stringify({ "rweb_lists_timeline_redesign_enabled": true, "responsive_web_graphql_exclude_directive_enabled": true, "verified_phone_label_enabled": false, "creator_subscriptions_tweet_preview_api_enabled": true, "responsive_web_graphql_timeline_navigation_enabled": true, "responsive_web_graphql_skip_user_profile_image_extensions_enabled": false, "tweetypie_unmention_optimization_enabled": true, "responsive_web_edit_tweet_api_enabled": true, "graphql_is_translatable_rweb_tweet_is_translatable_enabled": true, "view_counts_everywhere_api_enabled": true, "longform_notetweets_consumption_enabled": true, "responsive_web_twitter_article_tweet_consumption_enabled": false, "tweet_awards_web_tipping_enabled": false, "freedom_of_speech_not_reach_fetch_enabled": true, "standardized_nudges_misinfo": true, "tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": true, "longform_notetweets_rich_text_read_enabled": true, "longform_notetweets_inline_media_enabled": true, "responsive_web_media_download_video_enabled": false, "responsive_web_enhance_cards_enabled": false }));
+        const fieldToggles = encodeURI(JSON.stringify({ "withAuxiliaryUserLabels": false, "withArticleRichContentState": false }));
 
-        const response = await fetch(`https://api.twitter.com/2/search/adaptive.json?cards_platform=Web-12&tweet_mode=extended&simple_quoted_tweet=true&q=${keywords}&query_source=typed_query&count=20&requestContext=launch&pc=1&spelling_corrections=1`, {
-            headers: this.header
+        const response = await fetch(`https://twitter.com/i/api/graphql/NA567V_8AFwu0cZEkAAKcw/SearchTimeline?variables=${variables}&features=${features}&fieldToggles=${fieldToggles}`, {
+            "headers": this.header,
+            "body": null,
+            "method": "GET"
         });
 
         if (!response.ok) {
-            console.error(response);
-            //throw new Error(response);
+            throw new Error(response);
         }
 
         const data = await response.json();
@@ -152,6 +155,22 @@ export class TwitterClient {
             throw new Error(data.errors[0].message);
         }
 
-        console.log(data);
+        const instructions = data.data.search_by_raw_query.search_timeline.timeline.instructions;
+        const timelineInstruction = instructions.find(element => element.type === "TimelineAddEntries");
+        const entries = timelineInstruction.entries.filter(element => {
+            if(element.content.entryType !== "TimelineTimelineItem"){
+                return false;
+            }
+
+            return element.content.itemContent.itemType === "TimelineTweet";
+        }).map(element => {
+            return element.content.itemContent.tweet_results.result;
+        });
+
+        if(entries.length === 0) {
+            throw new Error("Entries empty");
+        }
+
+        return entries;
     }
 }
