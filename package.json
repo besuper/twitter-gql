@@ -3,10 +3,9 @@
     "version": "1.0.0",
     "description": "",
     "main": "src/twitter.js",
+    "types": "@types/index.d.ts",
     "type": "module",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
+    "scripts": {},
     "author": "besuper",
     "license": "ISC",
     "dependencies": {
