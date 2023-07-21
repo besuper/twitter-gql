@@ -2,17 +2,9 @@ import fetch from "node-fetch";
 import { GrapQLRequest } from "./graphql.js";
 import { has_error } from "./error.js";
 import { parse } from 'cookie';
+import fs from 'fs';
 
-const gql_id = {
-    "like": "lI07N6Otwv1PhnEgXILM7A",
-    "retweet": "ojPdsZsimiJrUGLR1sjUtA"
-};
-
-const endpoints = {
-    "follow": "https://api.twitter.com/1.1/friendships/create.json",
-    "like": `https://api.twitter.com/graphql/${gql_id["like"]}/FavoriteTweet`,
-    "retweet": `https://api.twitter.com/graphql/${gql_id["retweet"]}/CreateRetweet`
-};
+const endpoints = JSON.parse(fs.readFileSync("src/endpoints.json", "utf-8"));
 
 function getOrDefault(dict, name, def) {
     if (name in dict) {
@@ -70,7 +62,7 @@ export class TwitterClient {
     }
 
     async like(tweet_id) {
-        const like_request = new GrapQLRequest(endpoints["like"], gql_id["like"]);
+        const like_request = new GrapQLRequest(endpoints["like"]);
 
         like_request.add("tweet_id", tweet_id);
 
@@ -78,7 +70,7 @@ export class TwitterClient {
     }
 
     async retweet(tweet_id) {
-        const retweet_request = new GrapQLRequest(endpoints["retweet"], gql_id["retweet"]);
+        const retweet_request = new GrapQLRequest(endpoints["retweet"]);
 
         retweet_request.add("tweet_id", tweet_id);
         retweet_request.add("dark_request", false);
@@ -90,7 +82,7 @@ export class TwitterClient {
         const formData = new FormData();
         formData.append("user_id", user_id);
 
-        const response = await fetch(endpoints["follow"], {
+        const response = await fetch(endpoints["follow"].url, {
             method: 'POST',
             body: formData,
             headers: this.header
@@ -112,7 +104,7 @@ export class TwitterClient {
         const features = encodeURI(JSON.stringify({ "rweb_lists_timeline_redesign_enabled": true, "responsive_web_graphql_exclude_directive_enabled": true, "verified_phone_label_enabled": false, "creator_subscriptions_tweet_preview_api_enabled": true, "responsive_web_graphql_timeline_navigation_enabled": true, "responsive_web_graphql_skip_user_profile_image_extensions_enabled": false, "tweetypie_unmention_optimization_enabled": true, "responsive_web_edit_tweet_api_enabled": true, "graphql_is_translatable_rweb_tweet_is_translatable_enabled": true, "view_counts_everywhere_api_enabled": true, "longform_notetweets_consumption_enabled": true, "responsive_web_twitter_article_tweet_consumption_enabled": false, "tweet_awards_web_tipping_enabled": false, "freedom_of_speech_not_reach_fetch_enabled": true, "standardized_nudges_misinfo": true, "tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": true, "longform_notetweets_rich_text_read_enabled": true, "longform_notetweets_inline_media_enabled": true, "responsive_web_media_download_video_enabled": false, "responsive_web_enhance_cards_enabled": false }));
         const fieldToggles = encodeURI(JSON.stringify({ "withAuxiliaryUserLabels": false, "withArticleRichContentState": false }));
 
-        const response = await fetch(`https://twitter.com/i/api/graphql/NA567V_8AFwu0cZEkAAKcw/SearchTimeline?variables=${variables}&features=${features}&fieldToggles=${fieldToggles}`, {
+        const response = await fetch(`${endpoints["search"].url}?variables=${variables}&features=${features}&fieldToggles=${fieldToggles}`, {
             "headers": this.header,
             "body": null,
             "method": "GET"

@@ -1,9 +1,9 @@
 import fetch from "node-fetch";
 
 export class GrapQLRequest {
-    constructor(url, id, features = false) {
-        this.url = url;
-        this.id = id;
+    constructor(endpoint, features = false) {
+        this.url = endpoint.url;
+        this.id = endpoint.id;
         this.enable_features = features;
 
         this.variables = {};
