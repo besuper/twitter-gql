@@ -70,46 +70,20 @@ export class TwitterClient {
     }
 
     async like(tweet_id) {
-        const like_request = new GrapQLRequest(gql_id["like"]);
+        const like_request = new GrapQLRequest(endpoints["like"], gql_id["like"]);
+
         like_request.add("tweet_id", tweet_id);
 
-        const response = await fetch(endpoints["like"], {
-            method: 'POST',
-            body: like_request.serialize(),
-            headers: { ...this.header, 'Content-Type': 'application/json' }
-        });
-
-        if (!response.ok) {
-            throw new Error(response);
-        }
-
-        const data = await response.json();
-
-        if (has_error(data)) {
-            throw new Error(data.errors[0].message);
-        }
+        await like_request.request();
     }
 
     async retweet(tweet_id) {
-        const retweet_request = new GrapQLRequest(gql_id["retweet"]);
+        const retweet_request = new GrapQLRequest(endpoints["retweet"], gql_id["retweet"]);
+
         retweet_request.add("tweet_id", tweet_id);
         retweet_request.add("dark_request", false);
 
-        const response = await fetch(endpoints["retweet"], {
-            method: 'POST',
-            body: retweet_request.serialize(),
-            headers: { ...this.header, 'Content-Type': 'application/json' }
-        });
-
-        if (!response.ok) {
-            throw new Error(response);
-        }
-
-        const data = await response.json();
-
-        if (has_error(data)) {
-            throw new Error(data.errors[0].message);
-        }
+        await retweet_request.request();
     }
 
     async follow(user_id) {
@@ -151,14 +125,13 @@ export class TwitterClient {
         const data = await response.json();
 
         if (has_error(data)) {
-            console.log(data);
             throw new Error(data.errors[0].message);
         }
 
         const instructions = data.data.search_by_raw_query.search_timeline.timeline.instructions;
         const timelineInstruction = instructions.find(element => element.type === "TimelineAddEntries");
         const entries = timelineInstruction.entries.filter(element => {
-            if(element.content.entryType !== "TimelineTimelineItem"){
+            if (element.content.entryType !== "TimelineTimelineItem") {
                 return false;
             }
 
@@ -167,7 +140,7 @@ export class TwitterClient {
             return element.content.itemContent.tweet_results.result;
         });
 
-        if(entries.length === 0) {
+        if (entries.length === 0) {
             throw new Error("Entries empty");
         }
 
