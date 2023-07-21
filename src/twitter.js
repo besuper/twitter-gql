@@ -64,7 +64,7 @@ export class TwitterClient {
 
         like_request.add("tweet_id", tweet_id);
 
-        await like_request.request();
+        await like_request.request(this.header);
     }
 
     async retweet(tweet_id) {
@@ -73,7 +73,7 @@ export class TwitterClient {
         retweet_request.add("tweet_id", tweet_id);
         retweet_request.add("dark_request", false);
 
-        await retweet_request.request();
+        await retweet_request.request(this.header);
     }
 
     async follow(user_id) {
@@ -119,6 +119,61 @@ export class TwitterClient {
         }
 
         const instructions = data.data.search_by_raw_query.search_timeline.timeline.instructions;
+        const timelineInstruction = instructions.find(element => element.type === "TimelineAddEntries");
+        const entries = timelineInstruction.entries.filter(element => {
+            if (element.content.entryType !== "TimelineTimelineItem") {
+                return false;
+            }
+
+            return element.content.itemContent.itemType === "TimelineTweet";
+        }).map(element => {
+            return element.content.itemContent.tweet_results.result;
+        });
+
+        if (entries.length === 0) {
+            throw new Error("Entries empty");
+        }
+
+        return entries;
+    }
+
+    async timeline() {
+        const timelineRequest = new GrapQLRequest(endpoints["timeline"]);
+
+        timelineRequest.add("count", 20);
+        timelineRequest.add("includePromotedContent", true);
+        timelineRequest.add("latestControlAvailable", true);
+        timelineRequest.add("requestContext", "launch");
+        timelineRequest.add("withCommunity", true);
+        timelineRequest.add("seenTweetIds", []);
+
+        timelineRequest.add_feature("rweb_lists_timeline_redesign_enabled", true);
+        timelineRequest.add_feature("responsive_web_graphql_exclude_directive_enabled", true);
+        timelineRequest.add_feature("verified_phone_label_enabled", false);
+        timelineRequest.add_feature("creator_subscriptions_tweet_preview_api_enabled", true);
+        timelineRequest.add_feature("responsive_web_graphql_timeline_navigation_enabled", true);
+        timelineRequest.add_feature("responsive_web_graphql_skip_user_profile_image_extensions_enabled", false);
+        timelineRequest.add_feature("tweetypie_unmention_optimization_enabled", true);
+        timelineRequest.add_feature("responsive_web_edit_tweet_api_enabled", true);
+        timelineRequest.add_feature("graphql_is_translatable_rweb_tweet_is_translatable_enabled", true);
+        timelineRequest.add_feature("view_counts_everywhere_api_enabled", true);
+        timelineRequest.add_feature("longform_notetweets_consumption_enabled", true);
+        timelineRequest.add_feature("responsive_web_twitter_article_tweet_consumption_enabled", false);
+        timelineRequest.add_feature("tweet_awards_web_tipping_enabled", false);
+        timelineRequest.add_feature("freedom_of_speech_not_reach_fetch_enabled", true);
+        timelineRequest.add_feature("standardized_nudges_misinfo", true);
+        timelineRequest.add_feature("tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled", true);
+        timelineRequest.add_feature("longform_notetweets_rich_text_read_enabled", true);
+        timelineRequest.add_feature("longform_notetweets_inline_media_enabled", true);
+        timelineRequest.add_feature("responsive_web_media_download_video_enabled", false);
+        timelineRequest.add_feature("responsive_web_enhance_cards_enabled", false);
+
+        timelineRequest.add_field("withArticleRichContentState", false);
+        timelineRequest.add_field("withAuxiliaryUserLabels", false);
+
+        const data = await timelineRequest.request(this.header);
+
+        const instructions = data.data.home.home_timeline_urt.instructions;
         const timelineInstruction = instructions.find(element => element.type === "TimelineAddEntries");
         const entries = timelineInstruction.entries.filter(element => {
             if (element.content.entryType !== "TimelineTimelineItem") {

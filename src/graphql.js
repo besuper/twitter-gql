@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import { has_error } from "./error.js";
 
 export class GrapQLRequest {
     constructor(endpoint, features = false) {
@@ -8,6 +9,7 @@ export class GrapQLRequest {
 
         this.variables = {};
         this.features = {};
+        this.fieldToggles = {};
     }
 
     add(key, value) {
@@ -18,11 +20,19 @@ export class GrapQLRequest {
         this.features[key] = value;
     }
 
+    add_field(key, value) {
+        this.fieldToggles[key] = value;
+    }
+
     serialize() {
         const obj = { query_id: this.id };
 
-        if (this.enable_features || this.features.length > 0) {
+        if (this.enable_features || Object.keys(this.features).length > 0) {
             obj["features"] = this.features;
+        }
+
+        if(Object.keys(this.fieldToggles).length > 0) {
+            obj["fieldToggles"] = this.fieldToggles;
         }
 
         obj["variables"] = this.variables;
@@ -30,15 +40,15 @@ export class GrapQLRequest {
         return JSON.stringify(obj);
     }
 
-    async request() {
+    async request(header) {
         const response = await fetch(this.url, {
             method: 'POST',
             body: this.serialize(),
-            headers: { ...this.header, 'Content-Type': 'application/json' }
+            headers: { ...header, 'Content-Type': 'application/json' }
         });
 
         if (!response.ok) {
-            throw new Error(response);
+            throw new Error(response.statusText);
         }
 
         const data = await response.json();
@@ -46,5 +56,7 @@ export class GrapQLRequest {
         if (has_error(data)) {
             throw new Error(data.errors[0].message);
         }
+
+        return data;
     }
 }
