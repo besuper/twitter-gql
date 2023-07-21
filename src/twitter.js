@@ -2,9 +2,7 @@ import fetch from "node-fetch";
 import { GrapQLRequest } from "./graphql.js";
 import { has_error } from "./error.js";
 import { parse } from 'cookie';
-import fs from 'fs';
-
-const endpoints = JSON.parse(fs.readFileSync("src/endpoints.json", "utf-8"));
+import endpoints from './endpoints.json' assert { type: 'json'};
 
 function getOrDefault(dict, name, def) {
     if (name in dict) {
