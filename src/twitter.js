@@ -127,7 +127,10 @@ export class TwitterClient {
 
             return element.content.itemContent.itemType === "TimelineTweet";
         }).map(element => {
-            return element.content.itemContent.tweet_results.result;
+            const result = element.content.itemContent.tweet_results.result;
+            result.user = result.core.user_results.result;
+
+            return result;
         });
 
         if (entries.length === 0) {
@@ -182,7 +185,10 @@ export class TwitterClient {
 
             return element.content.itemContent.itemType === "TimelineTweet";
         }).map(element => {
-            return element.content.itemContent.tweet_results.result;
+            const result = element.content.itemContent.tweet_results.result;
+            result.user = result.core.user_results.result;
+
+            return result;
         });
 
         if (entries.length === 0) {
