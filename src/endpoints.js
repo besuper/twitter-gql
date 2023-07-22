@@ -1,4 +1,4 @@
-{
+export const endpoints = {
     "like": {
         "id": "lI07N6Otwv1PhnEgXILM7A",
         "url": "https://api.twitter.com/graphql/lI07N6Otwv1PhnEgXILM7A/FavoriteTweet"
@@ -16,4 +16,4 @@
     "timeline": {
         "url": "https://twitter.com/i/api/graphql/W4Tpu1uueTGK53paUgxF0Q/HomeTimeline"
     }
-}
+};
