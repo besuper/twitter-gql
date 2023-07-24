@@ -45,5 +45,5 @@ export class TwitterClient {
     retweet(tweet_id: string): Promise<void>;
     follow(user_id: string): Promise<void>;
     search(query: string, type?: string, count?: number): Promise<Tweet[]>;
-    timeline(): Promise<Tweet[]>;
+    timeline(type?: string): Promise<Tweet[]>;
 }

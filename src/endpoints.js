@@ -14,6 +14,13 @@ export const endpoints = {
         "url": "https://twitter.com/i/api/graphql/NA567V_8AFwu0cZEkAAKcw/SearchTimeline"
     },
     "timeline": {
-        "url": "https://twitter.com/i/api/graphql/W4Tpu1uueTGK53paUgxF0Q/HomeTimeline"
+        "for_you": {
+            "id": "W4Tpu1uueTGK53paUgxF0Q",
+            "url": "https://twitter.com/i/api/graphql/W4Tpu1uueTGK53paUgxF0Q/HomeTimeline"
+        },
+        "following": {
+            "id": "iMKdg5Vq-ldwmiqCbvX1QA",
+            "url": "https://twitter.com/i/api/graphql/iMKdg5Vq-ldwmiqCbvX1QA/HomeLatestTimeline"
+        }
     }
 };

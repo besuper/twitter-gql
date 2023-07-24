@@ -142,8 +142,8 @@ export class TwitterClient {
         return entries;
     }
 
-    async timeline() {
-        const timelineRequest = new GrapQLRequest(endpoints["timeline"]);
+    async timeline(type = "for_you") {
+        const timelineRequest = new GrapQLRequest(endpoints["timeline"][type]);
 
         timelineRequest.add("count", 20);
         timelineRequest.add("includePromotedContent", true);
