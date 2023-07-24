@@ -62,7 +62,9 @@ export class TwitterClient {
     async like(tweet_id) {
         const like_request = new GrapQLRequest(endpoints["like"]);
 
-        like_request.add("tweet_id", tweet_id);
+        like_request.add({
+            "tweet_id": tweet_id
+        });
 
         await like_request.request(this.header);
     }
@@ -70,8 +72,10 @@ export class TwitterClient {
     async retweet(tweet_id) {
         const retweet_request = new GrapQLRequest(endpoints["retweet"]);
 
-        retweet_request.add("tweet_id", tweet_id);
-        retweet_request.add("dark_request", false);
+        retweet_request.add({
+            "tweet_id": tweet_id,
+            "dark_request": false
+        });
 
         await retweet_request.request(this.header);
     }
@@ -145,36 +149,42 @@ export class TwitterClient {
     async timeline(type = "for_you") {
         const timelineRequest = new GrapQLRequest(endpoints["timeline"][type]);
 
-        timelineRequest.add("count", 20);
-        timelineRequest.add("includePromotedContent", true);
-        timelineRequest.add("latestControlAvailable", true);
-        timelineRequest.add("requestContext", "launch");
-        timelineRequest.add("withCommunity", true);
-        timelineRequest.add("seenTweetIds", []);
+        timelineRequest.add({
+            "count": 20,
+            "includePromotedContent": true,
+            "latestControlAvailable": true,
+            "requestContext": "launch",
+            "withCommunity": true,
+            "seenTweetIds": []
+        });
 
-        timelineRequest.add_feature("rweb_lists_timeline_redesign_enabled", true);
-        timelineRequest.add_feature("responsive_web_graphql_exclude_directive_enabled", true);
-        timelineRequest.add_feature("verified_phone_label_enabled", false);
-        timelineRequest.add_feature("creator_subscriptions_tweet_preview_api_enabled", true);
-        timelineRequest.add_feature("responsive_web_graphql_timeline_navigation_enabled", true);
-        timelineRequest.add_feature("responsive_web_graphql_skip_user_profile_image_extensions_enabled", false);
-        timelineRequest.add_feature("tweetypie_unmention_optimization_enabled", true);
-        timelineRequest.add_feature("responsive_web_edit_tweet_api_enabled", true);
-        timelineRequest.add_feature("graphql_is_translatable_rweb_tweet_is_translatable_enabled", true);
-        timelineRequest.add_feature("view_counts_everywhere_api_enabled", true);
-        timelineRequest.add_feature("longform_notetweets_consumption_enabled", true);
-        timelineRequest.add_feature("responsive_web_twitter_article_tweet_consumption_enabled", false);
-        timelineRequest.add_feature("tweet_awards_web_tipping_enabled", false);
-        timelineRequest.add_feature("freedom_of_speech_not_reach_fetch_enabled", true);
-        timelineRequest.add_feature("standardized_nudges_misinfo", true);
-        timelineRequest.add_feature("tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled", true);
-        timelineRequest.add_feature("longform_notetweets_rich_text_read_enabled", true);
-        timelineRequest.add_feature("longform_notetweets_inline_media_enabled", true);
-        timelineRequest.add_feature("responsive_web_media_download_video_enabled", false);
-        timelineRequest.add_feature("responsive_web_enhance_cards_enabled", false);
+        timelineRequest.add_feature({
+            "rweb_lists_timeline_redesign_enabled": true,
+            "responsive_web_graphql_exclude_directive_enabled": true,
+            "verified_phone_label_enabled": false,
+            "creator_subscriptions_tweet_preview_api_enabled": true,
+            "responsive_web_graphql_timeline_navigation_enabled": true,
+            "responsive_web_graphql_skip_user_profile_image_extensions_enabled": false,
+            "tweetypie_unmention_optimization_enabled": true,
+            "responsive_web_edit_tweet_api_enabled": true,
+            "graphql_is_translatable_rweb_tweet_is_translatable_enabled": true,
+            "view_counts_everywhere_api_enabled": true,
+            "longform_notetweets_consumption_enabled": true,
+            "responsive_web_twitter_article_tweet_consumption_enabled": false,
+            "tweet_awards_web_tipping_enabled": false,
+            "freedom_of_speech_not_reach_fetch_enabled": true,
+            "standardized_nudges_misinfo": true,
+            "tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": true,
+            "longform_notetweets_rich_text_read_enabled": true,
+            "longform_notetweets_inline_media_enabled": true,
+            "responsive_web_media_download_video_enabled": false,
+            "responsive_web_enhance_cards_enabled": false
+        });
 
-        timelineRequest.add_field("withArticleRichContentState", false);
-        timelineRequest.add_field("withAuxiliaryUserLabels", false);
+        timelineRequest.add_field({
+            "withArticleRichContentState": false,
+            "withAuxiliaryUserLabels": false
+        });
 
         const data = await timelineRequest.request(this.header);
 

@@ -12,16 +12,16 @@ export class GrapQLRequest {
         this.fieldToggles = {};
     }
 
-    add(key, value) {
-        this.variables[key] = value;
+    add(variables) {
+        this.variables = variables;
     }
 
-    add_feature(key, value) {
-        this.features[key] = value;
+    add_feature(features) {
+        this.features = features;
     }
 
-    add_field(key, value) {
-        this.fieldToggles[key] = value;
+    add_field(fields) {
+        this.fieldToggles = fields;
     }
 
     serialize() {
@@ -31,7 +31,7 @@ export class GrapQLRequest {
             obj["features"] = this.features;
         }
 
-        if(Object.keys(this.fieldToggles).length > 0) {
+        if (Object.keys(this.fieldToggles).length > 0) {
             obj["fieldToggles"] = this.fieldToggles;
         }
 
