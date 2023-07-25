@@ -22,5 +22,8 @@ export const endpoints = {
             "id": "iMKdg5Vq-ldwmiqCbvX1QA",
             "url": "https://twitter.com/i/api/graphql/iMKdg5Vq-ldwmiqCbvX1QA/HomeLatestTimeline"
         }
+    },
+    "followers": {
+        "url": "https://twitter.com/i/api/graphql/3yX7xr2hKjcZYnXt6cU6lQ/Followers"
     }
 };

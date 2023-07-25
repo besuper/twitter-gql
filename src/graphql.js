@@ -40,11 +40,39 @@ export class GrapQLRequest {
         return JSON.stringify(obj);
     }
 
+    serialize_query() {
+        this.variables = encodeURI(JSON.stringify(this.variables)).replaceAll("#", "%23");
+        this.features = encodeURI(JSON.stringify(this.features));
+        this.fieldToggles = encodeURI(JSON.stringify(this.fieldToggles));
+    }
+
     async request(header) {
         const response = await fetch(this.url, {
             method: 'POST',
             body: this.serialize(),
             headers: { ...header, 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        const data = await response.json();
+
+        if (has_error(data)) {
+            throw new Error(data.errors[0].message);
+        }
+
+        return data;
+    }
+
+    async request_query(header) {
+        this.serialize_query();
+
+        const response = await fetch(`${this.url}?variables=${this.variables}&features=${this.features}&fieldToggles=${this.fieldToggles}`, {
+            "headers": header,
+            "body": null,
+            "method": "GET"
         });
 
         if (!response.ok) {
