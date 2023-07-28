@@ -115,10 +115,6 @@ export class TwitterClient {
             headers: this.header
         });
 
-        if (!response.ok) {
-            throw new Error(response);
-        }
-
         const data = await response.json();
 
         if (has_error(data)) {

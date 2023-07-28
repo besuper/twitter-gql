@@ -53,10 +53,6 @@ export class GrapQLRequest {
             headers: { ...header, 'Content-Type': 'application/json' }
         });
 
-        if (!response.ok) {
-            throw new Error(response.statusText);
-        }
-
         const data = await response.json();
 
         if (has_error(data)) {
