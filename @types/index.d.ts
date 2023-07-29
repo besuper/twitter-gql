@@ -47,5 +47,5 @@ export class TwitterClient {
     search(query: string, type?: string, count?: number): Promise<Tweet[]>;
     timeline(type?: string): Promise<Tweet[]>;
     followers(user_id: string): Promise<User[]>;
-    tweet(content: string, medias: any[]): Promise<any>;
+    tweet(content: string, reply?: string, medias?: any[]): Promise<any>;
 }

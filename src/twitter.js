@@ -220,10 +220,19 @@ export class TwitterClient {
         return entries;
     }
 
-    async tweet(content, medias = []) {
+    async tweet(content, reply, medias = []) {
         const tweetRequest = new GrapQLRequest(endpoints["tweet"]);
 
-        tweetRequest.add({ "tweet_text": content, "dark_request": false, "media": { "media_entities": medias, "possibly_sensitive": false }, "semantic_annotation_ids": [] });
+        const variables = { "tweet_text": content, "dark_request": false, "media": { "media_entities": medias, "possibly_sensitive": false }, "semantic_annotation_ids": [] };
+
+        if (reply) {
+            variables["reply"] = {
+                "in_reply_to_tweet_id": reply,
+                "exclude_reply_user_ids": []
+            };
+        }
+
+        tweetRequest.add(variables);
         tweetRequest.add_feature(this.default_features);
         tweetRequest.add_field(this.default_fields);
 
