@@ -220,4 +220,16 @@ export class TwitterClient {
         return entries;
     }
 
+    async tweet(content, medias = []) {
+        const tweetRequest = new GrapQLRequest(endpoints["tweet"]);
+
+        tweetRequest.add({ "tweet_text": content, "dark_request": false, "media": { "media_entities": medias, "possibly_sensitive": false }, "semantic_annotation_ids": [] });
+        tweetRequest.add_feature(this.default_features);
+        tweetRequest.add_field(this.default_fields);
+
+        const data = await tweetRequest.request(this.header);
+
+        return data;
+    }
+
 }

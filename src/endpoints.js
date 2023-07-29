@@ -25,5 +25,9 @@ export const endpoints = {
     },
     "followers": {
         "url": "https://twitter.com/i/api/graphql/3yX7xr2hKjcZYnXt6cU6lQ/Followers"
+    },
+    "tweet": {
+        "id": "SoVnbfCycZ7fERGCwpZkYA",
+        "url": "https://twitter.com/i/api/graphql/SoVnbfCycZ7fERGCwpZkYA/CreateTweet"
     }
 };
