@@ -51,7 +51,8 @@ export class TwitterClient {
         const response = await fetch("https://twitter.com/home", {
             method: 'GET',
             headers: {
-                'Cookie': `auth_token=${this.auth_token}; guest_id=v1%9999;`
+                'Cookie': `auth_token=${this.auth_token}; guest_id=v1%9999;`,
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
             }
         });
 
@@ -80,7 +81,8 @@ export class TwitterClient {
         this.header = {
             "Authorization": "Bearer " + this.authorization,
             "Cookie": `auth_token=${this.auth_token}; ct0=${this.csrf}; ${getOrDefault(parsedCookies, 'lang', 'en')} ${getOrDefault(parsedCookies, 'gest_id', undefined)}${getOrDefault(parsedCookies, 'twid', undefined)}`,
-            "x-csrf-token": this.csrf
+            "x-csrf-token": this.csrf,
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
         };
     }
 
